@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101322">
+<meta name="description" content="PLAYZONE — free mini games you can play in your browser.">
+<title>PLAYZONE — Free Browser Games</title>
+<style>
+:root{--bg:#0c1020;--panel:#151b30;--panel2:#1d2540;--text:#f6f7ff;--muted:#a9b2ce;--accent:#8b5cf6;--cyan:#22d3ee;--line:#2c3555}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#1b2041 0,#0c1020 48%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh}
+button,input{font:inherit}button{cursor:pointer}.wrap{width:min(1120px,92%);margin:auto}
+header{display:flex;align-items:center;justify-content:space-between;padding:22px 0;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-size:1.4rem;font-weight:900;letter-spacing:1px}.logo{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--cyan));box-shadow:0 8px 28px #8b5cf644}
+nav{display:flex;gap:8px;flex-wrap:wrap}nav a{color:var(--muted);text-decoration:none;padding:9px 12px;border-radius:10px}nav a:hover{color:white;background:var(--panel2)}
+.hero{padding:36px 0 26px;display:grid;grid-template-columns:1.2fr .8fr;gap:20px;align-items:center}
+.eyebrow{color:var(--cyan);font-weight:800;text-transform:uppercase;letter-spacing:2px;font-size:.78rem}
+h1{font-size:clamp(2.5rem,7vw,4.8rem);line-height:.98;letter-spacing:-2px;margin:12px 0 18px}h1 span{background:linear-gradient(90deg,#a78bfa,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+p{color:var(--muted);line-height:1.6}.hero p{max-width:520px}.hero-card{border:1px solid var(--line);background:linear-gradient(145deg,#20294a,#151a2e);border-radius:25px;padding:24px;min-height:220px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 20px 70px #0004}
+.pixel{font-size:3.7rem;letter-spacing:8px}.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #3a4569;background:#252d49;padding:7px 11px;border-radius:999px;color:#dfe5ff;font-size:.82rem}
+.searchrow{display:flex;gap:12px;margin:12px 0 24px;flex-wrap:wrap}.searchrow input{flex:1;min-width:200px;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px 15px;color:white;outline:none}.searchrow input:focus{border-color:var(--accent)}
+.filters{display:flex;gap:8px;flex-wrap:wrap}.filter{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:10px 14px}.filter.active,.filter:hover{background:var(--accent);border-color:var(--accent);color:white}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:26px 0 15px}.section-head h2{margin:0;font-size:1.45rem}.section-head p{margin:4px 0 0;font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.game-card{border:1px solid var(--line);background:linear-gradient(160deg,#171e34,#111628);border-radius:19px;padding:14px;transition:transform .18s,border-color .18s;min-width:0}.game-card:hover{transform:translateY(-3px);border-color:#6d68bd}.game-art{height:145px;border-radius:13px;display:grid;place-items:center;font-size:3.7rem;position:relative;overflow:hidden}.art-click{background:radial-gradient(circle at 20% 20%,#fcd34d,#f97316 70%)}.art-memory{background:radial-gradient(circle at 80% 15%,#67e8f9,#2563eb 72%)}.art-dodge{background:radial-gradient(circle at 20% 20%,#c4b5fd,#7c3aed 70%)}.game-card h3{margin:13px 0 4px}.game-card p{margin:0 0 12px;font-size:.88rem}.card-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px}.tag{font-size:.75rem;color:#c4b5fd}.play-btn,.primary{background:linear-gradient(90deg,var(--accent),#6d5efc);border:0;color:white;border-radius:11px;padding:10px 14px;font-weight:800}.play-btn:hover,.primary:hover{filter:brightness(1.12)}.empty{display:none;color:var(--muted);padding:20px}
+footer{margin:44px 0 24px;border-top:1px solid var(--line);padding-top:20px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+.modal{display:none;position:fixed;inset:0;background:#050713eF;z-index:5;overflow:auto;padding:20px;align-items:center;justify-content:center}.modal.show{display:flex}.modal-box{width:min(680px,100%);background:#12182b;border:1px solid #354061;border-radius:22px;padding:20px;box-shadow:0 20px 90px #0009}.modal-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.modal-top h2{margin:0}.close{border:1px solid var(--line);background:var(--panel2);color:white;border-radius:10px;padding:8px 12px}.game-area{margin-top:14px;border-radius:15px;background:#0b1020;border:1px solid var(--line);padding:18px;text-align:center;min-height:260px;display:grid;place-items:center}.game-area p{margin:7px}.big-number{font-size:4rem;font-weight:900}.tap-target{width:110px;height:110px;border:0;border-radius:50%;background:linear-gradient(135deg,#facc15,#f97316);font-size:2.3rem;box-shadow:0 0 30px #f9731655}.memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:min(360px,100%);margin:10px auto}.memory-cell{height:62px;border:1px solid #47547a;background:#222c49;color:white;border-radius:10px;font-size:1.5rem}.memory-cell.revealed{background:#3c3175}.game-controls{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:12px}.secondary{border:1px solid var(--line);background:var(--panel2);color:white;border-radius:11px;padding:10px 14px}.note{font-size:.82rem;color:var(--muted)}
+@media(max-width:760px){.hero{grid-template-columns:1fr;padding-top:20px}.hero-card{min-height:170px}.grid{grid-template-columns:repeat(2,1fr)}.game-art{height:115px}.pixel{font-size:2.7rem}}
+@media(max-width:470px){.grid{grid-template-columns:1fr}.game-art{height:150px}h1{letter-spacing:-1px}.section-head{align-items:start;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><div class="logo">🎮</div> PLAYZONE</div>
+  <nav><a href="#games">Games</a><a href="#about">About</a></nav>
+</header>
+<main>
+<section class="hero">
+  <div><div class="eyebrow">Your browser. Your playground.</div>
+    <h1>PLAY MORE.<br><span>WAIT LESS.</span></h1>
+    <p>Quick mini-games, no downloads, no fuss. Pick a game and see if you can beat your best score.</p>
+    <a href="#games"><button class="primary">Explore games ↓</button></a>
+  </div>
+  <div class="hero-card"><div><span class="pill">✨ Free to play</span><div class="pixel">🟪 🟦 🟨</div></div><div><strong>Small games. Big fun.</strong><p style="margin:5px 0 0">Made for desktop and mobile browsers.</p></div></div>
+</section>
+<section id="games">
+  <div class="section-head"><div><h2>Choose your game</h2><p>Three mini-games are ready to play.</p></div><span class="pill" id="count">3 games</span></div>
+  <div class="searchrow"><input id="search" type="search" placeholder="Search games..." aria-label="Search games"><div class="filters">
+    <button class="filter active" data-filter="All">All</button><button class="filter" data-filter="Arcade">Arcade</button><button class="filter" data-filter="Puzzle">Puzzle</button>
+  </div></div>
+  <div class="grid" id="gameGrid">
+    <article class="game-card" data-name="tap rush" data-category="Arcade"><div class="game-art art-click">⚡👆</div><h3>Tap Rush</h3><p>Tap as fast as you can in 10 seconds.</p><div class="card-bottom"><span class="tag">ARCADE</span><button class="play-btn" data-game="tap">Play now ↗</button></div></article>
+    <article class="game-card" data-name="memory match" data-category="Puzzle"><div class="game-art art-memory">🧠🃏</div><h3>Memory Match</h3><p>Find all matching emoji pairs.</p><div class="card-bottom"><span class="tag">PUZZLE</span><button class="play-btn" data-game="memory">Play now ↗</button></div></article>
+    <article class="game-card" data-name="dodge drop" data-category="Arcade"><div class="game-art art-dodge">💎🟣</div><h3>Dodge Drop</h3><p>Move left and right to dodge falling blocks.</p><div class="card-bottom"><span class="tag">ARCADE</span><button class="play-btn" data-game="dodge">Play now ↗</button></div></article>
+  </div><div class="empty" id="empty">No games found. Try another search.</div>
+</section>
+<section id="about" style="margin-top:38px"><div class="section-head"><div><h2>Welcome to PLAYZONE</h2><p>A starter gaming website you can grow with your own original games.</p></div></div><p class="note">This starter demo has no ads, accounts, or payments. Add only games and artwork you created or have permission to publish.</p></section>
+</main>
+<footer><span>© <span id="year"></span> PLAYZONE</span><span>Made for fun · Built for the web</span></footer>
+</div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-box">
+  <div class="modal-top"><h2 id="modalTitle">Game</h2><button class="close" id="close">✕ Close</button></div>
+  <div class="game-area" id="gameArea"></div><div class="game-controls" id="gameControls"></div>
+</div></div>
+<script>
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+$('#year').textContent=new Date().getFullYear();
+let activeFilter='All';
+function filterGames(){const q=$('#search').value.toLowerCase();let n=0;$$('.game-card').forEach(c=>{const ok=c.dataset.name.includes(q)&&(activeFilter==='All'||c.dataset.category===activeFilter);c.style.display=ok?'':'none';if(ok)n++});$('#count').textContent=n+' game'+(n===1?'':'s');$('#empty').style.display=n?'none':'block'}
+$('#search').addEventListener('input',filterGames);
+$$('.filter').forEach(b=>b.addEventListener('click',()=>{$$('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeFilter=b.dataset.filter;filterGames()}));
+const modal=$('#modal'),area=$('#gameArea'),controls=$('#gameControls'),title=$('#modalTitle');let cleanups=[];
+function clearGame(){cleanups.forEach(fn=>fn());cleanups=[];area.innerHTML='';controls.innerHTML=''}
+function showGame(name){clearGame();modal.classList.add('show');if(name==='tap')startTap();if(name==='memory')startMemory();if(name==='dodge')startDodge()}
+function closeGame(){modal.classList.remove('show');clearGame()}
+$('#close').addEventListener('click',closeGame);modal.addEventListener('click',e=>{if(e.target===modal)closeGame()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeGame()});
+$$('[data-game]').forEach(b=>b.addEventListener('click',()=>showGame(b.dataset.game)));
+function btn(text,fn,cls='primary'){const b=document.createElement('button');b.className=cls;b.textContent=text;b.addEventListener('click',fn);controls.appendChild(b);return b}
+function startTap(){title.textContent='Tap Rush';let score=0,time=10,timer=null,started=false;area.innerHTML='<div><div class="big-number" id="tapScore">0</div><p id="tapMessage">Press Start, then tap the button as many times as possible!</p><p>Time: <strong id="tapTime">10</strong>s</p><button class="tap-target" id="tapTarget" disabled>👆</button></div>';const target=$('#tapTarget');target.addEventListener('click',()=>{if(started){score++;$('#tapScore').textContent=score}});btn('Start game',()=>{score=0;time=10;started=true;target.disabled=false;$('#tapScore').textContent='0';$('#tapTime').textContent='10';$('#tapMessage').textContent='Go go go!';controls.querySelector('button').disabled=true;timer=setInterval(()=>{time--;$('#tapTime').textContent=time;if(time<=0){clearInterval(timer);started=false;target.disabled=true;$('#tapMessage').textContent='Time! You scored '+score+' taps.';controls.querySelector('button').disabled=false}},1000);cleanups.push(()=>clearInterval(timer))});}
+function startMemory(){title.textContent='Memory Match';const emojis=['🐸','🚀','🍕','🎯','🐸','🚀','🍕','🎯'];let first=null,lock=false,matches=0,moves=0;const deck=emojis.sort(()=>Math.random()-.5);area.innerHTML='<div style="width:100%"><p>Find all four pairs.</p><p id="memoryStats">Moves: 0 · Pairs: 0/4</p><div class="memory-grid" id="memoryGrid"></div><p id="memoryMessage">Choose two cards.</p></div>';const grid=$('#memoryGrid');deck.forEach((emoji,i)=>{const b=document.createElement('button');b.className='memory-cell';b.textContent='?';b.setAttribute('aria-label','Hidden card');b.addEventListener('click',()=>{if(lock||b.classList.contains('revealed')||b.dataset.matched)return;b.textContent=emoji;b.classList.add('revealed');b.setAttribute('aria-label',emoji);if(!first){first={b,emoji};return}moves++;if(first.emoji===emoji){first.b.dataset.matched='1';b.dataset.matched='1';matches++;first=null;$('#memoryStats').textContent=`Moves: ${moves} · Pairs: ${matches}/4`;if(matches===4)$('#memoryMessage').textContent=`You won in ${moves} moves!`}else{const prev=first.b;first=null;lock=true;const t=setTimeout(()=>{prev.textContent='?';b.textContent='?';prev.classList.remove('revealed');b.classList.remove('revealed');lock=false},650);cleanups.push(()=>clearTimeout(t));$('#memoryStats').textContent=`Moves: ${moves} · Pairs: ${matches}/4`}});grid.appendChild(b)});btn('Shuffle / restart',()=>startMemory(),'secondary')}
+function startDodge(){title.textContent='Dodge Drop';area.innerHTML='<div style="width:100%"><p>Use ← → or A / D keys. On phone, use the buttons below.</p><canvas id="dodgeCanvas" width="420" height="300" style="display:block;width:100%;max-width:420px;margin:auto;background:#10182c;border-radius:12px;touch-action:none"></canvas><p id="dodgeScore">Score: 0</p></div>';const canvas=$('#dodgeCanvas'),ctx=canvas.getContext('2d');let player=190,blocks=[],score=0,alive=true,left=false,right=false,last=0,spawn=0;function key(e,on){const k=e.key.toLowerCase();if(['arrowleft','a','arrowright','d'].includes(k))e.preventDefault();if(k==='arrowleft'||k==='a')left=on;if(k==='arrowright'||k==='d')right=on}const kd=e=>key(e,true),ku=e=>key(e,false);document.addEventListener('keydown',kd);document.addEventListener('keyup',ku);cleanups.push(()=>{document.removeEventListener('keydown',kd);document.removeEventListener('keyup',ku);alive=false});function pad(label,which){const b=btn(label,()=>{if(which==='l')player=Math.max(8,player-24);else player=Math.min(372,player+24)},'secondary');b.addEventListener('pointerdown',()=>{if(which==='l')left=true;else right=true});const stop=()=>{left=false;right=false};b.addEventListener('pointerup',stop);b.addEventListener('pointerleave',stop);return b}pad('← Left','l');pad('Right →','r');function frame(ts){if(!alive)return;const dt=Math.min((ts-last)/16||1,2);last=ts;spawn+=dt;if(left)player-=4*dt;if(right)player+=4*dt;player=Math.max(8,Math.min(372,player));if(spawn>23){blocks.push({x:Math.random()*390,y:-18,s:15+Math.random()*13,v:2+Math.random()*2+score*.015});spawn=0}ctx.clearRect(0,0,420,300);ctx.fillStyle='#1a2440';ctx.fillRect(0,0,420,300);ctx.fillStyle='#a78bfa';ctx.fillRect(player,265,40,15);ctx.fillStyle='#fb7185';blocks.forEach(b=>{b.y+=b.v*dt;ctx.fillRect(b.x,b.y,b.s,b.s);if(b.y>300)b.gone=true;if(b.y+ b.s>265&&b.y<280&&b.x<player+40&&b.x+b.s>player)alive=false});blocks=blocks.filter(b=>!b.gone);score+=dt*.08;$('#dodgeScore').textContent='Score: '+Math.floor(score);if(!alive){ctx.fillStyle='white';ctx.font='bold 28px system-ui';ctx.textAlign='center';ctx.fillText('Game Over!',210,145);ctx.font='16px system-ui';ctx.fillText('Final score: '+Math.floor(score),210,175);return}requestAnimationFrame(frame)}requestAnimationFrame(frame)}
+</script>
+</body>
+</html>
