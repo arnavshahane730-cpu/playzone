@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PLAYZONE — 3D City Drive</title>
+<style>
+:root{color-scheme:dark;--bg:#080d18;--panel:#121b2d;--cyan:#4de7ff;--text:#f4f7ff}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text);touch-action:none}
+#game{position:fixed;inset:0}canvas{display:block}
+.hud{position:fixed;inset:0;pointer-events:none;padding:14px;display:flex;flex-direction:column;justify-content:space-between}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.brand{font-weight:900;letter-spacing:2px;font-size:14px;color:var(--cyan);text-shadow:0 2px 10px #000}.statbox{display:flex;gap:8px}.stat{background:#07101dcc;border:1px solid #ffffff22;border-radius:12px;padding:8px 11px;min-width:74px;text-align:center;backdrop-filter:blur(8px)}.stat small{display:block;color:#a8b6d1;font-size:10px;text-transform:uppercase;letter-spacing:1px}.stat strong{font-size:19px}
+.bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}.controls{display:flex;gap:10px;pointer-events:auto}.ctrl{width:66px;height:62px;border:1px solid #ffffff50;border-radius:18px;background:#0c1527cc;color:white;font-size:25px;font-weight:800;box-shadow:0 5px 0 #0005;touch-action:none;user-select:none}.ctrl:active,.ctrl.down{background:#1c5265;color:var(--cyan);transform:translateY(2px)}.pedals{display:flex;gap:9px;pointer-events:auto}.pedal{width:67px;height:70px;border-radius:18px;border:1px solid #ffffff50;background:#0c1527dd;color:white;font-weight:800;touch-action:none}.pedal small{display:block;font-size:10px;color:#b6c6dd;margin-top:4px}.pedal.gas{border-color:#42e6a4}.pedal.brake{border-color:#ff6c82}
+.overlay{position:fixed;inset:0;display:grid;place-items:center;background:#050916a8;padding:20px;z-index:5}.card{width:min(440px,100%);padding:26px;border-radius:24px;background:linear-gradient(145deg,#17253b,#0b1120);border:1px solid #ffffff26;box-shadow:0 20px 80px #0008;text-align:center}.logo{font-size:14px;letter-spacing:4px;font-weight:900;color:var(--cyan)}h1{margin:8px 0;font-size:clamp(30px,8vw,46px);line-height:1.02}p{color:#bdc9dd;line-height:1.5}.start{border:0;border-radius:14px;padding:14px 24px;background:linear-gradient(90deg,#37d9f4,#5cf0b1);color:#04101b;font-weight:900;font-size:16px;width:100%;margin-top:8px}.tip{font-size:12px;color:#8fa2bf}.hidden{display:none!important}.pause{pointer-events:auto;border:1px solid #ffffff40;background:#0b1426cc;color:white;border-radius:10px;padding:8px 12px;font-weight:700}
+@media(min-width:800px){.ctrl{width:76px;height:70px}.pedal{width:76px;height:80px}.hud{padding:22px}}
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div class="hud">
+  <div class="top">
+    <div><div class="brand">PLAYZONE / CITY DRIVE</div><button id="pause" class="pause" style="margin-top:9px">Ⅱ Pause</button></div>
+    <div class="statbox"><div class="stat"><small>Speed</small><strong><span id="speed">0</span><small style="display:inline"> km/h</small></strong></div><div class="stat"><small>Distance</small><strong><span id="distance">0</span><small style="display:inline"> m</small></strong></div></div>
+  </div>
+  <div class="bottom">
+    <div class="controls"><button class="ctrl" id="left">←</button><button class="ctrl" id="right">→</button></div>
+    <div class="pedals"><button class="pedal brake" id="brake">BRAKE<small>HOLD</small></button><button class="pedal gas" id="gas">GAS<small>HOLD</small></button></div>
+  </div>
+</div>
+<div class="overlay" id="menu"><div class="card"><div class="logo">PLAYZONE ORIGINAL</div><h1>3D CITY<br>DRIVE</h1><p>Drive through a colourful low-poly city. Dodge road barriers and see how far you can go.</p><button class="start" id="start">START DRIVING</button><p class="tip">Keyboard: ← → or A / D to steer, ↑ / W to accelerate, ↓ / S to brake. Mobile: use the on-screen controls.</p></div></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+const host=document.getElementById('game');
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x9bd7f3);scene.fog=new THREE.Fog(0x9bd7f3,38,180);
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,300);camera.position.set(0,5,10);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;host.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xe6f7ff,0x59636f,2));
+const sun=new THREE.DirectionalLight(0xffffff,2.2);sun.position.set(-8,18,10);sun.castShadow=true;scene.add(sun);
+const mat=(color,roughness=.85)=>new THREE.MeshStandardMaterial({color,roughness});
+const roadMat=mat(0x303946),lineMat=mat(0xf5f1d5),grassMat=mat(0x62ad75),sideMat=mat(0xbac5c6);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(300,300),grassMat);ground.rotation.x=-Math.PI/2;ground.position.y=-.13;scene.add(ground);
+const road=new THREE.Mesh(new THREE.PlaneGeometry(12,280),roadMat);road.rotation.x=-Math.PI/2;road.position.set(0,-.08,-100);scene.add(road);
+for(let z=-230;z<30;z+=8){const stripe=new THREE.Mesh(new THREE.BoxGeometry(.16,.025,3.5),lineMat);stripe.position.set(0,-.045,z);scene.add(stripe)}
+for(const x of [-6.2,6.2]){const curb=new THREE.Mesh(new THREE.BoxGeometry(.35,.16,280),sideMat);curb.position.set(x,-.02,-100);scene.add(curb)}
+// City blocks on both sides
+const buildingMats=[0xf2a65a,0x6e9ee8,0xd981a8,0x9bc7a3,0xe8d57b,0xb0a1e8,0xe7ecef].map(c=>mat(c));
+for(let z=-230;z<25;z+=12){for(const side of [-1,1]){const h=4+Math.random()*15,w=3+Math.random()*5,d=5+Math.random()*5;const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),buildingMats[Math.floor(Math.random()*buildingMats.length)]);b.position.set(side*(10+Math.random()*5),h/2-.1,z-Math.random()*5);b.castShadow=true;b.receiveShadow=true;scene.add(b);const roof=new THREE.Mesh(new THREE.BoxGeometry(w*.7,.3,d*.7),mat(0x526276));roof.position.set(b.position.x,h-.05,b.position.z);scene.add(roof)}}
+// car group: stylized sporty car
+const car=new THREE.Group();scene.add(car);
+const body=new THREE.Mesh(new THREE.BoxGeometry(1.65,.55,3.05),mat(0xe83e58,.45));body.position.y=.62;body.castShadow=true;car.add(body);
+const hood=new THREE.Mesh(new THREE.BoxGeometry(1.5,.22,1.05),mat(0xff6170,.45));hood.position.set(0,.88,-.83);car.add(hood);
+const cabin=new THREE.Mesh(new THREE.BoxGeometry(1.22,.62,1.35),mat(0x263d58,.3));cabin.position.set(0,1.12,.25);cabin.castShadow=true;car.add(cabin);
+const windshield=new THREE.Mesh(new THREE.BoxGeometry(1.08,.35,.08),mat(0x9ce9ff,.25));windshield.position.set(0,1.25,-.43);car.add(windshield);
+for(const x of [-.87,.87])for(const z of [-.95,.95]){const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.34,.34,.22,12),mat(0x171b22));wheel.rotation.z=Math.PI/2;wheel.position.set(x,.37,z);wheel.castShadow=true;car.add(wheel)}
+for(const x of [-.52,.52]){const lamp=new THREE.Mesh(new THREE.BoxGeometry(.3,.13,.06),mat(0xfff2b0));lamp.position.set(x,.69,-1.54);car.add(lamp)}
+car.position.set(0,0,4);
+// obstacles, positioned down the road
+const obstacles=[];const obstacleMat=mat(0xffb33e);
+for(let i=0;i<24;i++){const g=new THREE.Group();const base=new THREE.Mesh(new THREE.BoxGeometry(1.4,.65,.5),obstacleMat);base.position.y=.4;g.add(base);const band=new THREE.Mesh(new THREE.BoxGeometry(1.42,.16,.52),mat(0x252d39));band.position.y=.42;g.add(band);g.position.set([-3.7,0,3.7][Math.floor(Math.random()*3)],0,-24-i*8-Math.random()*5);scene.add(g);obstacles.push(g)}
+let speed=0,distance=0,steer=0,active=false,paused=false,gameOver=false;const keys={left:false,right:false,gas:false,brake:false};
+const speedEl=document.getElementById('speed'),distanceEl=document.getElementById('distance'),menu=document.getElementById('menu'),startBtn=document.getElementById('start'),pauseBtn=document.getElementById('pause');
+function bindHold(id,key){const el=document.getElementById(id);const on=ev=>{ev.preventDefault();keys[key]=true;el.classList.add('down')},off=ev=>{ev.preventDefault();keys[key]=false;el.classList.remove('down')};el.addEventListener('pointerdown',on);['pointerup','pointercancel','pointerleave'].forEach(e=>el.addEventListener(e,off))}
+bindHold('left','left');bindHold('right','right');bindHold('gas','gas');bindHold('brake','brake');
+addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key))e.preventDefault();if(e.key==='ArrowLeft'||e.key.toLowerCase()==='a')keys.left=true;if(e.key==='ArrowRight'||e.key.toLowerCase()==='d')keys.right=true;if(e.key==='ArrowUp'||e.key.toLowerCase()==='w')keys.gas=true;if(e.key==='ArrowDown'||e.key.toLowerCase()==='s')keys.brake=true;if(e.key==='Escape'||e.key.toLowerCase()==='p')togglePause()});
+addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key.toLowerCase()==='a')keys.left=false;if(e.key==='ArrowRight'||e.key.toLowerCase()==='d')keys.right=false;if(e.key==='ArrowUp'||e.key.toLowerCase()==='w')keys.gas=false;if(e.key==='ArrowDown'||e.key.toLowerCase()==='s')keys.brake=false});
+function reset(){speed=0;distance=0;steer=0;gameOver=false;paused=false;active=true;car.position.x=0;obstacles.forEach((o,i)=>{o.position.x=[-3.7,0,3.7][Math.floor(Math.random()*3)];o.position.z=-24-i*8-Math.random()*5});menu.classList.add('hidden');pauseBtn.textContent='Ⅱ Pause'}
+startBtn.addEventListener('click',reset);
+function togglePause(){if(!active||gameOver)return;paused=!paused;pauseBtn.textContent=paused?'▶ Resume':'Ⅱ Pause';if(paused){menu.classList.remove('hidden');menu.querySelector('h1').innerHTML='PAUSED';menu.querySelector('p').textContent='Take a breather, driver.';startBtn.textContent='RESUME DRIVING'}else menu.classList.add('hidden')}
+pauseBtn.addEventListener('click',togglePause);
+function endGame(){active=false;gameOver=true;menu.classList.remove('hidden');menu.querySelector('h1').innerHTML='CRASH!';menu.querySelector('p').textContent=`You drove ${Math.floor(distance)} metres. Try again and beat your distance!`;startBtn.textContent='DRIVE AGAIN'}
+const clock=new THREE.Clock();
+function loop(){requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.04);
+if(active&&!paused&&!gameOver){
+if(keys.gas)speed=Math.min(34,speed+17*dt);else speed=Math.max(0,speed-2.6*dt);
+if(keys.brake)speed=Math.max(0,speed-27*dt);
+const steerInput=(keys.left?-1:0)+(keys.right?1:0);steer+=((steerInput*4.8)-steer)*Math.min(1,dt*7);car.position.x+=steer*dt*Math.max(.25,speed/12);car.position.x=THREE.MathUtils.clamp(car.position.x,-4.65,4.65);car.rotation.y=-steer*.045;
+const travel=speed*dt;distance+=travel;obstacles.forEach(o=>{o.position.z+=travel;if(o.position.z>8){o.position.z=-190-Math.random()*35;o.position.x=[-3.7,0,3.7][Math.floor(Math.random()*3)]}if(Math.abs(o.position.z-car.position.z)<1.7&&Math.abs(o.position.x-car.position.x)<1.45&&speed>4)endGame()});
+camera.position.x+=(car.position.x*.42-camera.position.x)*dt*3;camera.position.y=4.5+speed*.012;camera.position.z=9.5;camera.lookAt(car.position.x*.35,.65,-7);
+speedEl.textContent=Math.round(speed*5.2);distanceEl.textContent=Math.floor(distance);
+}
+renderer.render(scene,camera)}
+loop();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body>
+</html>
